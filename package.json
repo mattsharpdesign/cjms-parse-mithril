@@ -10,5 +10,9 @@
   },
   "keywords": [],
   "author": "Matt Sharp <mattsharpdesign@gmail.com>",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "mithril": "^2.0.4",
+    "parse": "^3.4.1"
+  }
 }
