@@ -1,0 +1,5 @@
+{
+    "appId": "cjms-parse-server",
+    "masterKey": "myMasterKey",
+    "databaseURI": "mongodb://localhost:27017/database_name"
+}

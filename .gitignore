@@ -1,1 +1,8 @@
+# 
 node_modules/
+
+# Logs created by parse server
+logs/
+
+# Config for the parse server
+parse-server-config.json
