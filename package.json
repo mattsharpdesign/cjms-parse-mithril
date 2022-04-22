@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "parse-server": "parse-server --appId cjms-parse-mithril --masterKey myMasterKey --databaseURI mongodb://localhost:27017/cjms_dev",
     "parse-dashboard": "parse-dashboard --appId cjms-parse-mithril --masterKey myMasterKey --serverURL http://localhost:1337/parse",
-    "watch": "webpack --watch"
+    "watch": "webpack --mode=development --watch",
+    "build": "webpack --mode=production"
   },
   "keywords": [],
   "author": "Matt Sharp <mattsharpdesign@gmail.com>",
