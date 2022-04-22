@@ -1,0 +1,12 @@
+{
+  "name": "cjms-parse-mithril",
+  "version": "0.0.1",
+  "description": "Rewrite of the CoatingJMS app using Parse Server and MithrilJS",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Matt Sharp <mattsharpdesign@gmail.com>",
+  "license": "ISC"
+}
