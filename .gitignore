@@ -3,3 +3,6 @@ node_modules/
 
 # Logs created by parse server
 logs/
+
+# App js bundle
+dist/bundle.js

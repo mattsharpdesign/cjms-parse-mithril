@@ -2,11 +2,12 @@
   "name": "cjms-parse-mithril",
   "version": "0.0.1",
   "description": "Rewrite of the CoatingJMS app using Parse Server and MithrilJS",
-  "main": "index.js",
+  "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "parse-server": "parse-server --appId cjms-parse-mithril --masterKey myMasterKey --databaseURI mongodb://localhost:27017/cjms_dev",
-    "parse-dashboard": "parse-dashboard --appId cjms-parse-mithril --masterKey myMasterKey --serverURL http://localhost:1337/parse"
+    "parse-dashboard": "parse-dashboard --appId cjms-parse-mithril --masterKey myMasterKey --serverURL http://localhost:1337/parse",
+    "watch": "webpack --watch"
   },
   "keywords": [],
   "author": "Matt Sharp <mattsharpdesign@gmail.com>",
