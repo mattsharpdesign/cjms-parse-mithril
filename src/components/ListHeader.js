@@ -26,10 +26,12 @@ export default {
 const SearchInput = {
   view({ attrs }) {
     const { store } = attrs
-    return m('.ui icon input', [
+    return m('.ui icon input', {
+      class: !store.searchString && 'transparent',
+    }, [
       m('input.prompt[type=text][placeholder=Search...]', {
         value: store.searchString,
-        oninput: e => store.setSearchString(e.target.value)
+        oninput: e => store.setSearchString(e.target.value),
       }),
       m('i.link icon', {
         class: store.searchString.length > 0 ? 'cancel' : 'search',
