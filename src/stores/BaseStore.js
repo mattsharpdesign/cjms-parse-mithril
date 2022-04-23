@@ -43,20 +43,19 @@ export default class BaseStore {
 
     this.isLoading = true
     
-    let query = this.newQueryInstance()
-    this._query = query // so it can be cancelled
+    this._query = this.newQueryInstance()
 
-    query = this.addSearchToQuery(query)
+    this._query = this.addSearchToQuery(this._query)
 
-    query = this.addSortingToQuery(query)
+    this._query = this.addSortingToQuery(this._query)
     
     if (options.skip) {
-      query.skip(options.skip)
+      this._query.skip(options.skip)
     }
 
-    query.withCount()
+    this._query.withCount()
 
-    query.find()
+    this._query.find()
       .then(({ count, results }) => {
         if (options.append) {
           this.items = this.items.concat(results)
