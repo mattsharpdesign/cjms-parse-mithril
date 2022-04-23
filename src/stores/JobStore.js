@@ -151,7 +151,8 @@ export default class JobStore extends BaseStore {
   }
   
   addSortingToQuery(query) {
-    query.addAscending('dueDate')
+    query.addDescending('jobNum')
+    // query.addAscending('dueDate')
     return query
   }
 
