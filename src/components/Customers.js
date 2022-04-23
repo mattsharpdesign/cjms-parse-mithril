@@ -5,6 +5,9 @@ import LoadMoreButton from './LoadMoreButton'
 
 function Customers() {
   return {
+    oninit() {
+      if (!store.lastLoadedAt) store.load()
+    },
     view() {
       return m('[', [
         m(ListHeader, { store, title: 'Customers'}),
