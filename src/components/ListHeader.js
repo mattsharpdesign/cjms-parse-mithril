@@ -4,10 +4,11 @@ export default {
   view({ attrs }) {
     const { store, title } = attrs
     return m('.ui secondary menu', [
-      m('.header item', title),
+      // m('.header item', title),
+      m('.item', m(SearchInput, { store })),
       m('.item', [
         store.lastLoadedAt ? 
-          `${store.count} ${store.count > 1 ? 'items' : 'item'}`
+          `${store.count} ${(store.count > 1 || store.count === 0) ? 'items' : 'item'}`
           : 'Not loaded',
       ]),
       m('.right menu', [
@@ -18,6 +19,22 @@ export default {
           })
         )
       ])
+    ])
+  }
+}
+
+const SearchInput = {
+  view({ attrs }) {
+    const { store } = attrs
+    return m('.ui transparent icon input', [
+      m('input.prompt[type=text][placeholder=Search...]', {
+        value: store.searchString,
+        oninput: e => store.setSearchString(e.target.value)
+      }),
+      m('i.link icon', {
+        class: store.searchString.length > 0 ? 'cancel' : 'search',
+        onclick: () => store.setSearchString('')
+      })
     ])
   }
 }

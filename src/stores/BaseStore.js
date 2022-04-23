@@ -1,14 +1,29 @@
-import Parse from 'parse'
 import m from 'mithril'
 import handleParseError from '../handleParseError'
 
 export default class BaseStore {
+
   items = []
   isLoading = false
   lastLoadedAt = null
   count = null
   error = null
-  itemClass
+  searchString = ''
+
+  _query // the current query so it can be cancelled later if required
+
+
+
+  /**
+   * Get a new instance of the query used to get data from this collection
+   * 
+   * @returns Parse.Query
+   */
+  newQueryInstance() {
+    throw new Error('Stores must define newQueryInstance()')
+  }
+
+
 
   get hasError() {
     return this.error ? true : false
@@ -18,20 +33,22 @@ export default class BaseStore {
     return this.count > this.items.length
   }
 
-  constructor(itemClass) {
-    this.itemClass = itemClass
-  }
 
-  get defaultQuery() {
-    return new Parse.Query(this.itemClass)
-  }
 
   load(options = {}) {
 
+    if (this._query) {
+      this._query.cancel()
+    }
+
     this.isLoading = true
     
-    // const query = new Parse.Query(this.itemClass)
-    const query = this.defaultQuery
+    let query = this.newQueryInstance()
+    this._query = query // so it can be cancelled
+
+    query = this.addSearchToQuery(query)
+
+    query = this.addSortingToQuery(query)
     
     if (options.skip) {
       query.skip(options.skip)
@@ -57,14 +74,37 @@ export default class BaseStore {
       })
   }
 
+
+
   loadMore() {
     return this.load({ skip: this.items.length, append: true })
   }
+
+
+
+  addSearchToQuery(query) {
+    return query
+  }
+
+
+
+  addSortingToQuery(query) {
+    return query
+  }
+
+
 
   handleError(e) {
     if (!handleParseError(e)) {
       this.error = e.message
     }
+  }
+
+
+
+  setSearchString(value) {
+    this.searchString = value
+    this.load()
   }
 
 }

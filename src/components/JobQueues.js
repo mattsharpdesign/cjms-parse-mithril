@@ -1,6 +1,7 @@
 import m from 'mithril'
 import { jobStore as store } from '../stores'
 import ListHeader from './ListHeader'
+import LoadMoreButton from './LoadMoreButton'
 
 const queuesConfig = [
   { id: 'waterjet', heading: 'Waterjet' },
@@ -9,8 +10,6 @@ const queuesConfig = [
   { id: 'coating', heading: 'Coating' },
   { id: 'dispatch', heading: 'QA/Dispatch' },
 ]
-
-let queue = 'waterjet'
 
 export default {
   oninit() {
@@ -26,11 +25,20 @@ export default {
           },
           class: q.id === store.currentQueue ? 'active' : ''
         }, q.heading))
-        // m('.active item', 'Pretreatment'),
-        // m('.item', 'Coating'),
-        // m('.item', 'QA/Dispatch'),
       ]),
-      m(ListHeader, { store, title: `${queue} Queue` })
+      m(ListHeader, { store, title: `${store.currentQueue} Queue` }),
+      m('.ui segments', store.items.map(job => m(ListItem, { job }))),
+      m(LoadMoreButton, { store })
+    ])
+  }
+}
+
+const ListItem = {
+  view({attrs}) {
+    const { job } = attrs
+    return m('.ui segment', [
+      m('.header', job.get('customer').name),
+      m('p', job.get('description'))
     ])
   }
 }
