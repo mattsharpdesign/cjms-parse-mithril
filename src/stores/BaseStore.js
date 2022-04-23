@@ -22,11 +22,16 @@ export default class BaseStore {
     this.itemClass = itemClass
   }
 
+  get defaultQuery() {
+    return new Parse.Query(this.itemClass)
+  }
+
   load(options = {}) {
 
     this.isLoading = true
     
-    const query = new Parse.Query(this.itemClass)
+    // const query = new Parse.Query(this.itemClass)
+    const query = this.defaultQuery
     
     if (options.skip) {
       query.skip(options.skip)
