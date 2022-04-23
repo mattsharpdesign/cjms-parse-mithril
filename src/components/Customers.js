@@ -1,6 +1,7 @@
 import m from 'mithril'
 import { customerStore as store} from '../stores'
 import ListHeader from './ListHeader'
+import LoadMoreButton from './LoadMoreButton'
 
 function Customers() {
   return {
@@ -17,9 +18,7 @@ function Customers() {
           ]),
           m('tbody', store.customers.map(customer => m(TableRow, { customer })))
         ]),
-        store.hasMore && m('button.ui fluid button', {
-          onclick: () => store.loadMore()
-        }, store.isLoading ? 'Loading...' : 'Load more')
+        m(LoadMoreButton, { store })
       ])
     }
   }
