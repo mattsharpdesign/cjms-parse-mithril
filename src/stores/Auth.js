@@ -1,22 +1,24 @@
 import Parse from 'parse'
 
-const Auth = {
+class AuthStore {
 
-  error: null,
-  isLoggingIn: false,
+  error = null
+  isLoggingIn = false
 
-  current: Parse.User.current,
+  current = Parse.User.current
 
   logIn(username, password) {
-    Auth.isLoggingIn = true
+    this.isLoggingIn = true
     return Parse.User.logIn(username, password)
-      .then(() => Auth.error = null)
-      .catch(e => Auth.error = e.message)
-      .finally(() => Auth.isLoggingIn = false)
-  },
+      .then(() => this.error = null)
+      .catch(e => this.error = e.message)
+      .finally(() => this.isLoggingIn = false)
+  }
 
-  logOut: Parse.User.logOut,
-  
+  logOut = Parse.User.logOut
+
 }
 
-export default Auth
+const authStore = new AuthStore()
+
+export default authStore

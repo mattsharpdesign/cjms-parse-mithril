@@ -16,6 +16,7 @@ export default function() {
       return m('form', {
         onsubmit: handleSubmit
       }, [
+        Auth.error && m('.alert alert-danger', Auth.error),
         m('.form-group', [
           m('label', 'Username'),
           m('input.form-control[type=text]', {
@@ -30,7 +31,6 @@ export default function() {
             oninput: e => password = e.target.value,
           }),
         ]),
-        Auth.error && m('.alert alert-danger', Auth.error),
         m('button.btn btn-block btn-primary', Auth.isLoggingIn ? 'Logging in...' : 'Log in')
       ])
     }

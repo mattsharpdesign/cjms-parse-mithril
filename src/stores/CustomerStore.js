@@ -1,0 +1,68 @@
+import Parse from 'parse'
+import m from 'mithril'
+import handleParseError from '../handleParseError'
+
+const Customer = Parse.Object.extend('Customer')
+
+class CustomerStore {
+  items = []
+  isLoading = false
+  lastLoadedAt = null
+  count = null
+  error = null
+
+  get customers() {
+    return this.items
+  }
+
+  get hasError() {
+    return this.error ? true : false
+  }
+
+  get hasMore() {
+    return this.count > this.items.length
+  }
+
+  load(options = {}) {
+
+    this.isLoading = true
+    
+    const query = new Parse.Query(Customer)
+    
+    if (options.skip) {
+      query.skip(options.skip)
+    }
+
+    query.withCount()
+
+    query.find()
+      .then(({ count, results }) => {
+        if (options.append) {
+          this.items = this.items.concat(results)
+        } else {
+          this.items = results
+        }
+        this.count = count
+        this.lastLoadedAt = new Date()
+        this.error = null
+      })
+      .catch(e => this.handleError(e))
+      .finally(() => {
+        this.isLoading = false
+        m.redraw()
+      })
+  }
+
+  loadMore() {
+    return this.load({ skip: this.items.length, append: true })
+  }
+
+  handleError(e) {
+    if (!handleParseError(e)) {
+      this.error = e.message
+    }
+  }
+
+}
+
+export default CustomerStore
