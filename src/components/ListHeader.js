@@ -7,9 +7,9 @@ export default {
       // m('.header item', title),
       m('.item', m(SearchInput, { store })),
       m('.item', [
-        store.lastLoadedAt ? 
+        store.isLoading ? 
+          'Loading...' :
           `${store.count} ${(store.count > 1 || store.count === 0) ? 'items' : 'item'}`
-          : 'Not loaded',
       ]),
       m('.right menu', [
         m('.link icon item',
@@ -26,7 +26,7 @@ export default {
 const SearchInput = {
   view({ attrs }) {
     const { store } = attrs
-    return m('.ui transparent icon input', [
+    return m('.ui icon input', [
       m('input.prompt[type=text][placeholder=Search...]', {
         value: store.searchString,
         oninput: e => store.setSearchString(e.target.value)
