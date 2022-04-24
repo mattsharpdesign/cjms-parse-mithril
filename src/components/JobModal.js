@@ -89,23 +89,58 @@ function JobModal() {
               processesConfig.map(p => {
                 const jobP = job.get(p.id)
                 return m('.ui attached segment', [
-                  m('.ui toggle checkbox', [
-                    m('input[type=checkbox]'),
-                    m('label', p.heading)
-                  ]),
+                  m('span.process-heading', p.heading),
+                  p.hasOwnProperty('adminComponent') ?
+                    m(p.adminComponent, { job })
+                  :
+                    m('.ui toggle checkbox', [
+                      m('input[type=checkbox]', {
+                        checked: job.has(p.id) && job.get(p.id).required
+                      }),
+                      m('label', job.has(p.id) && job.get(p.id).required
+                        ? 'Required' : 'Not required'),
+                    ]),
+
+                  p.hasOwnProperty('describeWith') &&
+                    m('.process-description', p.describeWith(job))
                 ])
               }),
 
               // Flags (urgent, qa)
+              m('.two fields', [
+                m('.field', [
+                  m('.ui toggle checkbox', [
+                    m('input[type=checkbox]', {
+                      checked: job.has('isUrgent') && job.get('isUrgent') === true
+                    }),
+                    m('label', 'Urgent'),
+                  ]),
+                ]),
+                m('.field', [
+                  m('.ui toggle checkbox', [
+                    m('input[type=checkbox]', {
+                      checked: job.has('qc') && job.get('qc') === true
+                    }),
+                    m('label', 'QC'),
+                  ]),
+                ]),
+              ]),
 
               // Job items
               m('h4.ui top attached header', 'Items'),
               job.has('items') ? job.get('items').map(i => m('.ui attached segment', [
                 i.description
               ])) : m('.ui attached secondary segment', 'No items have been added.'),
-              m('.ui bottom attached segment', 'Add an item')
+              m('.ui bottom attached segment', 'Add an item'),
 
               // Notes
+              m('textarea[placeholder=Notes][rows=3]'),
+
+              // Costing area
+              !job.isNew() && m('[', [
+                m('h4.ui top attached header', 'Costing'),
+                m('.ui attached segment', 'TODO...'),
+              ]),
 
             ])
           ]),

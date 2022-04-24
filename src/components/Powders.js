@@ -7,7 +7,7 @@ export default {
   oninit() {
     if (!store.lastLoadedAt) store.load()
   },
-  view() {
+  view({ attrs: { onSelect }}) {
     return m('[', [
       m(ListHeader, { store, title: 'Powders' }),
       m('table.ui selectable table', [
@@ -18,7 +18,7 @@ export default {
           m('th', 'Price per kg'),
           m('th', 'Last stock take'),
         ]),
-        m('tbody', store.items.map(powder => m(TableRow, { powder })))
+        m('tbody', store.items.map(powder => m(TableRow, { powder, onSelect })))
       ]),
       m(LoadMoreButton, { store })
     ])
@@ -27,8 +27,10 @@ export default {
 
 const TableRow = {
   view({ attrs }) {
-    const { powder } = attrs
-    return m('tr', [
+    const { powder, onSelect } = attrs
+    return m('tr', {
+      onclick: () => onSelect(powder)
+    }, [
       m('td', powder.get('manufacturer')),
       m('td', powder.get('colour')),
       m('td', powder.get('code')),

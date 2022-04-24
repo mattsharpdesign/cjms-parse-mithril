@@ -5,3 +5,14 @@
 .selectable {
   cursor: pointer;
 }
+
+.process-description {
+  margin-left: 14px;
+  font-weight: bold;
+  display: inline-block;
+}
+
+span.process-heading {
+  display: inline-block;
+  width: 120px;
+}

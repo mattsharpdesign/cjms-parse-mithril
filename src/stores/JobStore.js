@@ -3,16 +3,33 @@ import addBusinessDays from 'date-fns/addBusinessDays'
 import BaseStore from './BaseStore'
 
 const Job = Parse.Object.extend('Job', {
+  initialize(attrs, options) {
+    this.setOrderDate(new Date()),
+    this.set('dispatch', {
+      description: 'Customer collect'
+    })
+  },
   setCustomer(customer) {
     this.set('customer', {
       id: customer.id,
       name: customer.get('name')
     })
-    // this.set('dispatch.description', customer.get(''))
+    const dispatchMethod = customer.has('defaultDispatchMethod')
+      ? customer.get('defaultDispatchMethod')
+      : 'Customer collect'
+    this.set('dispatch.description', dispatchMethod)
   },
   setOrderDate(date) {
     this.set('orderDate', date)
     this.set('dueDate', addBusinessDays(date, 3))
+  },
+  setPowder(powder) {
+    this.set('coating.powder', {
+      id: powder.id,
+      manufacturer: powder.get('manufacturer'),
+      colour: powder.get('colour'),
+      code: powder.get('code'),
+    })
   }
 })
 
