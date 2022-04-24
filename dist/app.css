@@ -1,3 +1,7 @@
 .ui.transparent.input.active {
   border-bottom: 2px solid red !important;
 }
+
+.selectable {
+  cursor: pointer;
+}

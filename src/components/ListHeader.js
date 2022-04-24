@@ -3,7 +3,7 @@ import m from 'mithril'
 export default {
   view({ attrs, children }) {
     const { store, title } = attrs
-    return m('.ui secondary menu', [
+    return m('.ui menu', [
       // m('.header item', title),
       m('.item', m(SearchInput, { store })),
       m('.item', [
