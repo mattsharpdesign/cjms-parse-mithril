@@ -1,3 +1,47 @@
+/*
+Animations (mainly for modals)
+*/
+@keyframes fade-in {
+	from {opacity: 0;}
+	to {opacity: 1;}
+}
+
+@keyframes fade-out {
+	from {opacity: 1;}
+	to {opacity: 0;}
+}
+
+@keyframes slide-in {
+  from { margin-left: 200px; }
+  to { margin-left: 0; }
+}
+
+@keyframes slide-out {
+  from { margin-left: 0; }
+  to { margin-left: 200px; }
+}
+
+.dimmer.transition {
+  transition: opacity 0.4s;
+  animation: fade-in 0.4s;
+}
+
+.dimmer.transition.hide {
+  animation: fade-out 0.4s;
+}
+
+.ui.active.modal {
+  animation: slide-in 0.4s;
+}
+
+.dimmer.transition.hide .ui.active.modal {
+  animation: slide-out 0.4s;
+}
+
+
+
+
+
 .ui.transparent.input.active {
   border-bottom: 2px solid red !important;
 }

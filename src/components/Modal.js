@@ -41,12 +41,12 @@ const Modal = function() {
       children = v.children
     },
     onbeforeremove: (vnode) => {
-      console.log('dimmer onbeforeremove')
+      // console.log('dimmer onbeforeremove')
       // Add a class with fade-out exit animation
       dom.classList.add('hide')
       return new Promise(r => {
-        setTimeout(() => r(), 100) 
-        // dom.addEventListener('animationend', r)
+        // setTimeout(() => r(), 100) 
+        dom.addEventListener('animationend', r)
       })
     },
     onremove() {
