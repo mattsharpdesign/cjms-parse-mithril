@@ -3,7 +3,7 @@ import m from 'mithril'
 export default {
   view({ attrs, children }) {
     const { store, title } = attrs
-    return m('.ui menu', [
+    return m('.ui secondary menu', [
       // m('.header item', title),
       m('.item', m(SearchInput, { store })),
       m('.item', [
@@ -28,7 +28,7 @@ const SearchInput = {
   view({ attrs }) {
     const { store } = attrs
     return m('.ui transparent icon input', {
-      class: store.searchString && 'focus',
+      class: store.searchString && 'active',
     }, [
       m('input.prompt[type=text][placeholder=Search...]', {
         value: store.searchString,

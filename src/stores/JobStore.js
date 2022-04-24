@@ -1,7 +1,14 @@
 import Parse from 'parse'
 import BaseStore from './BaseStore'
 
-const Job = Parse.Object.extend('Job')
+const Job = Parse.Object.extend('Job', {
+  setCustomer(customer) {
+    this.set('customer', {
+      id: customer.id,
+      name: customer.get('name')
+    })
+  }
+})
 
 const notGone = new Parse.Query(Job).notEqualTo('dispatch.isGone', true)
 

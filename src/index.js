@@ -14,7 +14,7 @@ m.route(rootElement, '/home', {
     render: () => m(Layout, m(Home))
   },
   '/customers': {
-    render: () => m(Layout, m(Customers))
+    render: () => m(Layout, m(Customers, { view: 'table' }))
   },
   '/powders': {
     render: () => m(Layout, m(Powders))
