@@ -62,7 +62,7 @@ function JobModal() {
                   m('input[type=date]', {
                     value: forHtmlInput(job.get('orderDate')),
                     onchange(e) {
-                      job.set('orderDate', fromHtmlInput(e.target.value))
+                      job.setOrderDate(fromHtmlInput(e.target.value))
                     }
                   })
                 ]),

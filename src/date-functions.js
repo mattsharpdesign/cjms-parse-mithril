@@ -11,5 +11,8 @@ export function forHtmlInput(date) {
 
 export function fromHtmlInput(string) {
   const date = parseISO(string)
+  if (!(date instanceof Date)) {
+    return null
+  }
   return date
 }

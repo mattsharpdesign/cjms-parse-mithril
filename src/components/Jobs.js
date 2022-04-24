@@ -60,6 +60,7 @@ function Jobs() {
       } else {
         if (!store.lastLoadedAt && !store.isLoading) store.load()
       }
+      openModal()
     },
     view() {
       const items = store.items || []

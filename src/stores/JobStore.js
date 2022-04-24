@@ -1,4 +1,5 @@
 import Parse from 'parse'
+import addBusinessDays from 'date-fns/addBusinessDays'
 import BaseStore from './BaseStore'
 
 const Job = Parse.Object.extend('Job', {
@@ -7,6 +8,11 @@ const Job = Parse.Object.extend('Job', {
       id: customer.id,
       name: customer.get('name')
     })
+    // this.set('dispatch.description', customer.get(''))
+  },
+  setOrderDate(date) {
+    this.set('orderDate', date)
+    this.set('dueDate', addBusinessDays(date, 3))
   }
 })
 
