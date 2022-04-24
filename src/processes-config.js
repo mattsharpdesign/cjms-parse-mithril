@@ -1,6 +1,7 @@
 import JobDispatchControl from './components/JobDispatchControl'
 import JobCoatingControl from './components/JobCoatingControl'
 import DefaultJobProcessControl from './components/DefaultJobProcessControl'
+import JobPretreatmentControl from './components/JobPretreatmentControl'
 
 export default [
   {
@@ -16,7 +17,7 @@ export default [
   {
     id: 'pretreatment',
     heading: 'Pretreatment',
-    formControlComponent: DefaultJobProcessControl,
+    formControlComponent: JobPretreatmentControl,
   },
   {
     id: 'coating',

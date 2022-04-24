@@ -19,7 +19,7 @@ export default function() {
         isSelectorOpen && m(Dimmer, m(DispatchMethodSelector, {
           close: () => window.history.back(),
           onSelect: method => {
-            job.set('dispatch.description', method.get('description'))
+            job.setDispatchMethod(method)
             // document.getElementById('job-form-delivery-address-input').focus()
             window.history.back()
           },

@@ -28,11 +28,11 @@ function JobModal({ attrs: { job } }) {
       
       function handleSubmit(e) {
         e.preventDefault()
-        const isNew = job.isNew()
-        console.log('Saving: ', job)
-        if (!isNew) {
-          close()
-        }
+        // const isNew = job.isNew()
+        console.log(job)
+        // if (!isNew) {
+        //   close()
+        // }
       }
 
       return m('[', [
@@ -157,13 +157,32 @@ function JobModal({ attrs: { job } }) {
 
               // Job items
               m('h4.ui top attached header', 'Items'),
-              job.has('items') ? job.get('items').map(i => m('.ui attached segment', [
-                i.description
-              ])) : m('.ui attached secondary segment', 'No items have been added.'),
-              m('.ui bottom attached segment', 'Add an item'),
+              m('.ui attached segment', {
+                class: !job.has('items') ? 'secondary' : '',
+              }, [
+              
+                job.has('items') && m('.ui divided items', [
+                  job.get('items').map(item => m('.item', [
+                    m('.content', [
+                      m('.ui label', `${item.qty}x`),
+                      ' ',
+                      item.description,
+                    ])
+                  ]))
+                ]),
+              
+                !job.has('items') && 'No items have been added.',
+              ]),
+              
+              m('.ui bottom attached secondary segment', [
+                m('a[href]', 'Add an item'),
+              ]),
 
               // Notes
-              m('textarea[placeholder=Notes][rows=3]'),
+              m('textarea[placeholder=Notes][rows=3]', {
+                value: job.get('notes'),
+                oninput: e => job.set('notes', e.target.value),
+              }),
 
               // Costing area
               !job.isNew() && m('[', [
@@ -176,10 +195,12 @@ function JobModal({ attrs: { job } }) {
 
           m('.actions', [
             
-            m('button.ui primary button', {
-              onclick: handleSubmit,
-              disabled: !job.isReadyToSave(),
-            }, job.isNew() ? 'Save' : 'Save and close'),
+            (job.dirty() || job.isNew()) && [
+              m('button.ui primary button', {
+                onclick: handleSubmit,
+                disabled: !job.isReadyToSave(),
+              }, 'Save'),
+            ],
             
             (job.dirty() && !job.isNew()) && [
               m('button[type=button].ui button', {
@@ -187,10 +208,10 @@ function JobModal({ attrs: { job } }) {
               }, 'Undo changes')
             ],
             
-            job.isNew() && [
+            (!job.dirty() || job.isNew()) && [
               m('.ui button', {
                 onclick: () => close()
-              }, 'Cancel')
+              }, job.isNew() ? 'Cancel' : 'Close')
             ]
 
           ])
