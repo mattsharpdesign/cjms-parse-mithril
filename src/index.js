@@ -22,6 +22,9 @@ m.route(rootElement, '/home', {
   '/jobs': {
     render: () => m(Layout, m(Jobs))
   },
+  '/jobs/:jobNum': {
+    render: ({ attrs: { jobNum} }) => m(Layout, m(Jobs, { jobNum }))
+  },
   '/queues': {
     render: () => m(Layout, m(JobQueues))
   },

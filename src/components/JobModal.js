@@ -4,24 +4,44 @@ import { forHtmlInput, fromHtmlInput } from '../date-functions'
 import Modal from './Modal'
 import CustomerSelector from './CustomerSelector'
 
-function JobModal() {
+function JobModal({ attrs: { job } }) {
   let isCustomerSelectorOpen = false
 
   return {
+    onremove() {
+      console.log('removing job modal')
+      if (job.dirty()) {
+        job.revert()
+        m.redraw()
+      }
+    },
+
+    onbeforeupdate() {
+      if (m.route.param('selectCustomer')) {
+        isCustomerSelectorOpen = true
+      } else {
+        isCustomerSelectorOpen = false
+      }
+    },
+
     view({ attrs: { job, close } }) {
+      
       function handleSubmit(e) {
         e.preventDefault()
-        console.log(job)
-        close()
+        const isNew = job.isNew()
+        console.log('Saving: ', job)
+        if (!isNew) {
+          close()
+        }
       }
 
       return m('[', [
         isCustomerSelectorOpen && (
           m(Modal, m(CustomerSelector, { 
-            close: () => isCustomerSelectorOpen = false,
+            close: () => window.history.back(),
             onSelect: customer => {
               job.setCustomer(customer)
-              isCustomerSelectorOpen = false
+              window.history.back()
               document.getElementById('job-form-description-input').focus()
             }
           }))
@@ -39,15 +59,18 @@ function JobModal() {
                 m('.content', [
                   m('.header', job.has('customer') ? job.get('customer').name : 'Customer is required'),
                   m('.selectable', {
-                    onclick: () => isCustomerSelectorOpen = true
+                    // onclick: () => isCustomerSelectorOpen = true
+                    onclick: () => {
+                      m.route.set(`${m.route.get()}?selectCustomer=true`)
+                    }
                   }, job.has('customer') ? 'Change customer' : 'Select customer'),
                 ])
               ]),
 
               // Job description
               m('.field', [
-                m('.ui huge fluid left icon input', [
-                  m('i.pencil icon'),
+                m('.ui huge fluid input left icon', [
+                  m('i.info icon'),
                   m('input[type=text][placeholder=Job description...][id=job-form-description-input]', {
                     value: job.get('description'),
                     oninput: e => job.set('description', e.target.value),
@@ -79,39 +102,44 @@ function JobModal() {
                   m('label', 'Order Number'),
                   m('input[type=text]', {
                     value: job.get('orderNum'),
-                    oninput: e => job.set('orderNum', e.target.value),
+                    oninput: e => {
+                      job.set('orderNum', e.target.value)
+                      job.validateOrderNumber().then(() => m.redraw())
+                    },
                   })
                 ]),
               ]),
 
+              job.orderNumberCount > 0 && [
+                m('.ui visible warning message',
+                  `Customer seems to already have ${job.orderNumberCount}
+                  ${job.orderNumberCount > 1 ? 'orders' : 'order'}
+                  with that order number.`
+                )
+              ],
+
               // Processes
               m('h4.ui top attached header', 'Processes'),
-              processesConfig.map(p => {
-                const jobP = job.get(p.id)
+              processesConfig.map(process => {
                 return m('.ui attached segment', [
-                  m('span.process-heading', p.heading),
-                  p.hasOwnProperty('adminComponent') ?
-                    m(p.adminComponent, { job })
-                  :
-                    m('.ui toggle checkbox', [
-                      m('input[type=checkbox]', {
-                        checked: job.has(p.id) && job.get(p.id).required
-                      }),
-                      m('label', job.has(p.id) && job.get(p.id).required
-                        ? 'Required' : 'Not required'),
-                    ]),
-
-                  p.hasOwnProperty('describeWith') &&
-                    m('.process-description', p.describeWith(job))
+                  m('span.process-heading', process.heading),
+                  m(process.formControlComponent, { job, processKey: process.id })
                 ])
               }),
 
               // Flags (urgent, qa)
-              m('.two fields', [
-                m('.field', [
-                  m('.ui toggle checkbox', [
+              m('.fields', {
+                style: { paddingTop: '28px' },
+              }, [
+                m('.field', {
+                  style: { marginRight: '42px' },
+                }, [
+                  m('.ui toggle checkbox', {
+                    class: job.get('isUrgent') ? 'checked' : '',
+                  }, [
                     m('input[type=checkbox]', {
-                      checked: job.has('isUrgent') && job.get('isUrgent') === true
+                      checked: job.has('isUrgent') && job.get('isUrgent') === true,
+                      onclick: () => job.set('isUrgent', job.get('isUrgent') ? false : true),
                     }),
                     m('label', 'Urgent'),
                   ]),
@@ -119,9 +147,10 @@ function JobModal() {
                 m('.field', [
                   m('.ui toggle checkbox', [
                     m('input[type=checkbox]', {
-                      checked: job.has('qc') && job.get('qc') === true
+                      checked: job.has('qc') && job.get('qc') === true,
+                      onclick: () => job.set('qc', job.get('qc') ? false : true),
                     }),
-                    m('label', 'QC'),
+                    m('label', 'QC Required'),
                   ]),
                 ]),
               ]),
@@ -146,13 +175,24 @@ function JobModal() {
           ]),
 
           m('.actions', [
+            
             m('button.ui primary button', {
-              onclick: handleSubmit
-            }, 'Save and close'),
-            job.dirty() &&
+              onclick: handleSubmit,
+              disabled: !job.isReadyToSave(),
+            }, job.isNew() ? 'Save' : 'Save and close'),
+            
+            (job.dirty() && !job.isNew()) && [
               m('button[type=button].ui button', {
                 onclick: () => job.revert()
-              }, 'Undo changes'),
+              }, 'Undo changes')
+            ],
+            
+            job.isNew() && [
+              m('.ui button', {
+                onclick: () => close()
+              }, 'Cancel')
+            ]
+
           ])
         ])
       ])

@@ -9,6 +9,32 @@ const Job = Parse.Object.extend('Job', {
       description: 'Customer collect'
     })
   },
+
+  isReadyToSave() {
+    if (!this.has('customer')) {
+      return false
+    }
+    if (!this.has('description') || !this.get('description').length) {
+      return false
+    }
+    return true
+  },
+
+  validateOrderNumber() {
+    if (this._orderNumQuery) this._orderNumQuery.cancel()
+    if (!this.has('customer')) return
+    this._orderNumQuery = new Parse.Query(Job)
+    this._orderNumQuery.equalTo('customer.id', this.get('customer').id)
+    this._orderNumQuery.equalTo('orderNum', this.get('orderNum'))
+    if (this.has('jobNum')) {
+      this._orderNumQuery.notEqualTo('jobNum', this.get('jobNum'))
+    }
+    return this._orderNumQuery.count().then((count) => {
+      console.log(count)
+      this.orderNumberCount = count
+    })
+  },
+
   setCustomer(customer) {
     this.set('customer', {
       id: customer.id,
@@ -18,11 +44,14 @@ const Job = Parse.Object.extend('Job', {
       ? customer.get('defaultDispatchMethod')
       : 'Customer collect'
     this.set('dispatch.description', dispatchMethod)
+    this.set('deliveryAddress', customer.get('address'))
   },
+
   setOrderDate(date) {
     this.set('orderDate', date)
     this.set('dueDate', addBusinessDays(date, 3))
   },
+
   setPowder(powder) {
     this.set('coating.powder', {
       id: powder.id,
@@ -62,6 +91,8 @@ export default class JobStore extends BaseStore {
   groupBy = 'status' // or 'queue'
   status = 'all' // all|unfinished|finished|approved|invoiced
   queue = 'pretreatment'
+
+  _orderNumQuery
 
   newItemInstance() {
     return new Job()
@@ -168,6 +199,12 @@ export default class JobStore extends BaseStore {
     return query
   }
 
+  findOrFetchByJobNum(jobNum) {
+    console.log('finding job ', jobNum)
+    let job = this.items.find(i => i.get('jobNum') === Number(jobNum))
+    return Promise.resolve(job)
+  }
+
   addSearchToQuery(query) {
     if (!this.searchString) {
       return query
@@ -203,6 +240,17 @@ export default class JobStore extends BaseStore {
   setQueue(queue) {
     this.queue = queue
     this.load()
+  }
+
+  validateOrderNumber(customerId, orderNum, excludeJobNum) {
+    if (this._orderNumQuery) this._orderNumQuery.cancel()
+    this._orderNumQuery = new Parse.Query(Job)
+    this._orderNumQuery.equalTo('customer.id', customerId)
+    this._orderNumQuery.equalTo('orderNum', orderNum)
+    this._orderNumQuery.notEqualTo('jobNum', excludeJobNum)
+    this._orderNumQuery.count().then(response => {
+      console.log(response)
+    })
   }
 
   get jobs() {

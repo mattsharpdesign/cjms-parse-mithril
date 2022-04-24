@@ -2,9 +2,8 @@ import m from 'mithril'
 
 export default {
   view({ attrs, children }) {
-    const { store, title } = attrs
+    const { store } = attrs
     return m('.ui menu', [
-      // m('.header item', title),
       m('.item', m(SearchInput, { store })),
       m('.item', [
         store.isLoading ? 

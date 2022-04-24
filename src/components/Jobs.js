@@ -17,15 +17,16 @@ function Jobs() {
   let selected = []
   let isModalOpen = false
   let currentJob = null
+  let currentJobNum
 
   function openModal(job = null) {
-
     currentJob = !job ? store.newItemInstance() : job
     isModalOpen = true
   }
 
   function closeModal() {
     isModalOpen = false
+    currentJobNum = null
   }
 
   function toggleSelected(job) {
@@ -55,13 +56,35 @@ function Jobs() {
 
   return {
     oninit() {
+      console.log('Jobs oninit')
       if (store.groupBy !== 'status') {
         store.setGroupBy('status')
       } else {
         if (!store.lastLoadedAt && !store.isLoading) store.load()
       }
-      openModal()
+      // openModal()
     },
+
+    onbeforeupdate({ attrs: { jobNum } }) {
+      if (jobNum) {
+        if (jobNum !== currentJobNum) {
+          currentJobNum = jobNum
+          if (jobNum === 'new') {
+            const job = store.newItemInstance()
+            openModal(job)
+            m.redraw()
+          } else {
+            store.findOrFetchByJobNum(jobNum).then(job => {
+              openModal(job)
+              m.redraw()
+            })
+          }
+        }
+      } else {
+        closeModal()
+      }
+    },
+
     view() {
       const items = store.items || []
       return m('[', [
@@ -69,7 +92,9 @@ function Jobs() {
         isModalOpen && (
           m(Modal, m(JobModal, {
             job: currentJob,
-            close: closeModal
+            // close: closeModal,
+            // close: () => m.route.set('/jobs', {}, { replace: true })
+            close: () => window.history.back()
           }))
         ),
 
@@ -85,7 +110,8 @@ function Jobs() {
 
         m(ListHeader, { store }, [
           m('.link item', {
-            onclick: () => openModal(),
+            // onclick: () => openModal(),
+            onclick: () => m.route.set('/jobs/:jobNum', { jobNum: 'new' })
           }, [
             m('i.plus icon')
           ]),
@@ -139,7 +165,8 @@ function Jobs() {
 const TableRow = {
   view({ attrs: { job, isSelected, onClick, onDblClick } }) {
     return m('tr', {
-      onclick: () => onClick(job),
+      // onclick: () => onClick(job),
+      onclick: () => m.route.set('/jobs/:jobNum', { jobNum: job.get('jobNum') }),
       ondblclick: () => onDblClick(job),
       class: isSelected ? 'active' : '',
     }, [

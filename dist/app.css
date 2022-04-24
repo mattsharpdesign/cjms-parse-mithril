@@ -18,7 +18,7 @@ Animations (mainly for modals)
 
 @keyframes slide-out {
   from { margin-left: 0; }
-  to { margin-left: 200px; }
+  to { margin-left: 300px; }
 }
 
 .dimmer.transition {
@@ -27,6 +27,7 @@ Animations (mainly for modals)
 }
 
 .dimmer.transition.hide {
+  transition: opacity 0.4s;
   animation: fade-out 0.4s;
 }
 
@@ -58,5 +59,9 @@ Animations (mainly for modals)
 
 span.process-heading {
   display: inline-block;
-  width: 120px;
+  width: 140px;
+}
+
+#job-form-delivery-address-input {
+  margin-top: 14px;
 }

@@ -4,11 +4,11 @@ import Powders from './Powders'
 function PowderSelector() {
   return {
     view({ attrs: { onSelect, close }}) {
-      return m('.ui small active modal', [
+      return m('.ui active modal', [
         m('.header', 'Select Powder'),
         m('.scrolling content', m(Powders, { onSelect })),
         m('.actions', [
-          m('.ui button', 'Close'),
+          m('.ui button', { onclick: close }, 'Close'),
         ])
       ])
     }
