@@ -1,0 +1,164 @@
+[{
+	"_id": "_User",
+	"objectId": "string",
+	"updatedAt": "date",
+	"createdAt": "date",
+	"username": "string",
+	"email": "string",
+	"emailVerified": "boolean",
+	"authData": "object",
+	"_metadata": {
+		"indexes": {
+			"_id_": {
+				"_id": 1
+			},
+			"username_1": {
+				"username": 1
+			},
+			"email_1": {
+				"email": 1
+			},
+			"case_insensitive_username": {
+				"username": 1
+			},
+			"case_insensitive_email": {
+				"email": 1
+			}
+		}
+	}
+},
+{
+	"_id": "_Role",
+	"objectId": "string",
+	"updatedAt": "date",
+	"createdAt": "date",
+	"name": "string",
+	"users": "relation<_User>",
+	"roles": "relation<_Role>",
+	"_metadata": {
+		"indexes": {
+			"_id_": {
+				"_id": 1
+			},
+			"name_1": {
+				"name": 1
+			}
+		}
+	}
+},
+{
+	"_id": "Powder",
+	"objectId": "string",
+	"updatedAt": "date",
+	"createdAt": "date",
+	"_metadata": {
+		"fields_options": {
+			"colour": {
+				"required": true
+			},
+			"manufacturer": {
+				"required": false
+			}
+		},
+		"indexes": {
+			"_id_": {
+				"_id": 1
+			}
+		}
+	},
+	"colour": "string",
+	"manufacturer": "string"
+},
+{
+	"_id": "_Session",
+	"objectId": "string",
+	"updatedAt": "date",
+	"createdAt": "date",
+	"restricted": "boolean",
+	"user": "*_User",
+	"installationId": "string",
+	"sessionToken": "string",
+	"expiresAt": "date",
+	"createdWith": "object",
+	"_metadata": {
+		"indexes": {
+			"_id_": {
+				"_id": 1
+			}
+		}
+	}
+},
+{
+	"_id": "Customer",
+	"objectId": "string",
+	"updatedAt": "date",
+	"createdAt": "date",
+	"_metadata": {
+		"indexes": {
+			"_id_": {
+				"_id": 1
+			},
+			"name_text": {
+				"name": "text"
+			}
+		},
+		"fields_options": {
+			"name": {
+				"required": true
+			}
+		}
+	},
+	"name": "string"
+},
+{
+	"_id": "Job",
+	"objectId": "string",
+	"updatedAt": "date",
+	"createdAt": "date",
+	"_metadata": {
+		"indexes": {
+			"_id_": {
+				"_id": 1
+			}
+		},
+		"fields_options": {
+			"orderDate": {
+				"required": false
+			},
+			"jobNum": {
+				"required": false
+			}
+		}
+	},
+	"orderDate": "date",
+	"jobNum": "number"
+},
+{
+	"_id": "DispatchMethod",
+	"objectId": "string",
+	"updatedAt": "date",
+	"createdAt": "date",
+	"_metadata": {
+		"fields_options": {
+			"description": {
+				"required": true
+			}
+		}
+	},
+	"description": "string"
+},
+{
+	"_id": "PretreatmentMethod",
+	"objectId": "string",
+	"updatedAt": "date",
+	"createdAt": "date",
+	"_metadata": {
+		"fields_options": {
+			"description": {
+				"required": true
+			}
+		}
+	},
+	"description": "string"
+}]
+
