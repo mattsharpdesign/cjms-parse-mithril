@@ -19,7 +19,8 @@ function Jobs() {
   let currentJob = null
 
   function openModal(job = null) {
-    currentJob = job || store.newItemInstance()
+
+    currentJob = !job ? store.newItemInstance() : job
     isModalOpen = true
   }
 
@@ -83,7 +84,7 @@ function Jobs() {
 
         m(ListHeader, { store }, [
           m('.link item', {
-            onclick: openModal,
+            onclick: () => openModal(),
           }, [
             m('i.plus icon')
           ]),
