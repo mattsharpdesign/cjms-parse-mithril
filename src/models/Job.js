@@ -58,7 +58,7 @@ export default Parse.Object.extend('Job', {
       this.set('pretreatment', null)
     } else {
       this.set('pretreatment.id', method.id)
-      this.set('pretreatment.description', )
+      this.set('pretreatment.description', description)
     }
   },
 

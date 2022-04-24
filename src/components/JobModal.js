@@ -1,11 +1,14 @@
 import m from 'mithril'
 import processesConfig from '../processes-config'
 import { forHtmlInput, fromHtmlInput } from '../date-functions'
-import Modal from './Modal'
+import Dimmer from './Modal'
 import CustomerSelector from './CustomerSelector'
+import JobItemForm from './JobItemForm'
 
 function JobModal({ attrs: { job } }) {
   let isCustomerSelectorOpen = false
+  let isItemFormOpen = false
+  let itemIndex
 
   return {
     onremove() {
@@ -22,6 +25,13 @@ function JobModal({ attrs: { job } }) {
       } else {
         isCustomerSelectorOpen = false
       }
+      if (m.route.param('editItem')) {
+        itemIndex = Number(m.route.param('editItem'))
+        isItemFormOpen = true
+      } else {
+        itemIndex = null
+        isItemFormOpen = false
+      }
     },
 
     view({ attrs: { job, close } }) {
@@ -37,7 +47,7 @@ function JobModal({ attrs: { job } }) {
 
       return m('[', [
         isCustomerSelectorOpen && (
-          m(Modal, m(CustomerSelector, { 
+          m(Dimmer, m(CustomerSelector, { 
             close: () => window.history.back(),
             onSelect: customer => {
               job.setCustomer(customer)
@@ -46,6 +56,14 @@ function JobModal({ attrs: { job } }) {
             }
           }))
         ),
+
+        isItemFormOpen && (
+          m(Dimmer, m(JobItemForm, { 
+            item: job.get('items')[itemIndex],
+            close: () => window.history.back(),
+          }))
+        ),
+
         m('.ui active large modal', [
           m('.header', job.isNew() ? 'New Job' : `Job ${job.get('jobNum')}`),
           m('.scrolling content', [
@@ -162,11 +180,22 @@ function JobModal({ attrs: { job } }) {
               }, [
               
                 job.has('items') && m('.ui divided items', [
-                  job.get('items').map(item => m('.item', [
+                  job.get('items').map((item, index) => m('.item', {
+                    key: index,
+                  }, [
                     m('.content', [
                       m('.ui label', `${item.qty}x`),
                       ' ',
                       item.description,
+                      m('.ui right floated icon button', [
+                        m('i.remove icon')
+                      ]),
+                      m(m.route.Link, {
+                        class: 'ui right floated icon button',
+                        href: `${m.route.get()}?editItem=${index}`
+                       }, [
+                        m('i.pencil icon')
+                      ]),
                     ])
                   ]))
                 ]),
