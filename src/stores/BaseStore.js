@@ -22,6 +22,11 @@ export default class BaseStore {
   newQueryInstance() {
     throw new Error('Stores must define newQueryInstance()')
   }
+  
+  
+  newItemInstance() {
+    throw new Error('Stores must define newItemInstance()')
+  }
 
 
 
@@ -56,7 +61,9 @@ export default class BaseStore {
     this._query.withCount()
 
     this._query.find()
-      .then(({ count, results }) => {
+      .then((response) => {
+        const results = response.results || response
+        const count = response.count || null
         if (options.append) {
           this.items = this.items.concat(results)
         } else {

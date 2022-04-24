@@ -1,9 +1,9 @@
 import m from 'mithril'
 
 export default {
-  view({ attrs }) {
+  view({ attrs, children }) {
     const { store, title } = attrs
-    return m('.ui secondary menu', [
+    return m('.ui menu', [
       // m('.header item', title),
       m('.item', m(SearchInput, { store })),
       m('.item', [
@@ -12,6 +12,7 @@ export default {
           `${store.count} ${(store.count > 1 || store.count === 0) ? 'items' : 'item'}`
       ]),
       m('.right menu', [
+        children,
         m('.link icon item',
           m('i.refresh icon', {
             onclick: () => store.load(),
@@ -26,8 +27,8 @@ export default {
 const SearchInput = {
   view({ attrs }) {
     const { store } = attrs
-    return m('.ui icon input', {
-      class: !store.searchString && 'transparent',
+    return m('.ui transparent icon input', {
+      class: store.searchString && 'focus',
     }, [
       m('input.prompt[type=text][placeholder=Search...]', {
         value: store.searchString,

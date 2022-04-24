@@ -32,6 +32,10 @@ export default class JobStore extends BaseStore {
   groupBy = 'status' // or 'queue'
   status = 'all' // all|unfinished|finished|approved|invoiced
   queue = 'pretreatment'
+
+  newItemInstance() {
+    return new Job()
+  }
   
   newQueryInstance() {
 

@@ -2,14 +2,8 @@ import m from 'mithril'
 import { jobStore as store } from '../stores'
 import ListHeader from './ListHeader'
 import LoadMoreButton from './LoadMoreButton'
+import queuesConfig from '../processes-config'
 
-const queuesConfig = [
-  { id: 'waterjet', heading: 'Waterjet' },
-  { id: 'flashing', heading: 'Flashings' },
-  { id: 'pretreatment', heading: 'Pretreatment' },
-  { id: 'coating', heading: 'Coating' },
-  { id: 'dispatch', heading: 'QA/Dispatch' },
-]
 
 export default {
   oninit() {
