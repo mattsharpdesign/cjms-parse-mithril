@@ -3,7 +3,6 @@ import processesConfig from '../processes-config'
 import { forHtmlInput, fromHtmlInput } from '../date-functions'
 import Dimmer from './Modal'
 import CustomerSelector from './CustomerSelector'
-import JobItemForm from './JobItemForm'
 
 function JobModal({ attrs: { job } }) {
   console.log(job)
@@ -20,17 +19,9 @@ function JobModal({ attrs: { job } }) {
       } else {
         isCustomerSelectorOpen = false
       }
-      if (m.route.param('editItem')) {
-        itemIndex = Number(m.route.param('editItem'))
-        isItemFormOpen = true
-      } else {
-        // itemIndex = null
-        isItemFormOpen = false
-      }
     },
 
     onremove() {
-      console.log('removing job modal')
       if (job.dirty()) {
         job.revert()
         m.redraw()
@@ -42,14 +33,6 @@ function JobModal({ attrs: { job } }) {
         isCustomerSelectorOpen = true
       } else {
         isCustomerSelectorOpen = false
-      }
-      
-      if (m.route.param('editItem')) {
-        itemIndex = Number(m.route.param('editItem'))
-        isItemFormOpen = true
-      } else {
-        // itemIndex = null
-        isItemFormOpen = false
       }
     },
 
@@ -65,6 +48,7 @@ function JobModal({ attrs: { job } }) {
       }
 
       return m('[', [
+
         isCustomerSelectorOpen && (
           m(Dimmer, m(CustomerSelector, { 
             close: () => window.history.back(),
@@ -73,32 +57,6 @@ function JobModal({ attrs: { job } }) {
               window.history.back()
               document.getElementById('job-form-description-input').focus()
             }
-          }))
-        ),
-
-        isItemFormOpen && (
-          m(Dimmer, m(JobItemForm, { 
-            // job,
-            // item,
-            item: job.get('items')[itemIndex],
-            // onEdit: () => {
-            //   console.log(job.get('items')[itemIndex])
-            // },
-            whenDone: () => {
-              let clone = job.get('items').map(x => x)
-              console.log(itemIndex)
-              clone[itemIndex].description = 'fart'
-
-              job.set('items', clone)
-              m.redraw()
-            },
-            close: () => {
-              // let items = job.get('items')
-              // items[itemIndex] = modifiedItem
-              // job.set('items', items)
-              
-              window.history.back()
-            },
           }))
         ),
 
@@ -135,44 +93,46 @@ function JobModal({ attrs: { job } }) {
               ]),
 
               // Order number and dates
-              m('.fields', [
-                m('.four wide field', [
-                  m('label', 'Order Date'),
-                  m('input[type=date]', {
-                    value: forHtmlInput(job.get('orderDate')),
-                    onchange(e) {
-                      job.setOrderDate(fromHtmlInput(e.target.value))
-                    }
-                  })
+              m('[', [
+                m('.fields', [
+                  m('.four wide field', [
+                    m('label', 'Order Date'),
+                    m('input[type=date]', {
+                      value: forHtmlInput(job.get('orderDate')),
+                      onchange(e) {
+                        job.setOrderDate(fromHtmlInput(e.target.value))
+                      }
+                    })
+                  ]),
+                  m('.four wide field', [
+                    m('label', 'Due Date'),
+                    m('input[type=date]', {
+                      value: forHtmlInput(job.get('dueDate')),
+                      onchange(e) {
+                        job.set('dueDate', fromHtmlInput(e.target.value))
+                      }
+                    })
+                  ]),
+                  m('.eight wide field', [
+                    m('label', 'Order Number'),
+                    m('input[type=text]', {
+                      value: job.get('orderNum'),
+                      oninput: e => {
+                        job.set('orderNum', e.target.value)
+                        job.validateOrderNumber().then(() => m.redraw())
+                      },
+                    })
+                  ]),
                 ]),
-                m('.four wide field', [
-                  m('label', 'Due Date'),
-                  m('input[type=date]', {
-                    value: forHtmlInput(job.get('dueDate')),
-                    onchange(e) {
-                      job.set('dueDate', fromHtmlInput(e.target.value))
-                    }
-                  })
-                ]),
-                m('.eight wide field', [
-                  m('label', 'Order Number'),
-                  m('input[type=text]', {
-                    value: job.get('orderNum'),
-                    oninput: e => {
-                      job.set('orderNum', e.target.value)
-                      job.validateOrderNumber().then(() => m.redraw())
-                    },
-                  })
-                ]),
-              ]),
 
-              job.orderNumberCount > 0 && [
-                m('.ui visible warning message',
-                  `Customer seems to already have ${job.orderNumberCount}
-                  ${job.orderNumberCount > 1 ? 'orders' : 'order'}
-                  with that order number.`
-                )
-              ],
+                job.orderNumberCount > 0 && [
+                  m('.ui visible warning message',
+                    `Customer seems to already have ${job.orderNumberCount}
+                    ${job.orderNumberCount > 1 ? 'orders' : 'order'}
+                    with that order number.`
+                  )
+                ],
+              ]),
 
               // Processes
               m('h4.ui top attached header', 'Processes'),
@@ -213,17 +173,7 @@ function JobModal({ attrs: { job } }) {
 
               // Job items
               m('h4.ui top attached segment', 'Job Items'),
-              m(JobItemsTable, {
-                items: job.get('items'),
-                onRemove: item => job.remove('items', item),
-                onEdit: (item, _index) => {
-                  const itemsCopy = job.get('items').map(i => ({ ...i }))
-                  const index = itemsCopy.findIndex(i => i.id === item.id)
-                  itemsCopy[index] = item
-                  job.set('items', itemsCopy)
-                  // m.redraw()
-                }
-              }),
+              m(JobItemsTable, { job }),
 
               // Notes
               m('textarea[placeholder=Notes][rows=3]', {
@@ -252,7 +202,6 @@ function JobModal({ attrs: { job } }) {
             (job.dirty() && !job.isNew()) && [
               m('button[type=button].ui button', {
                 onclick: () => {
-                  console.log(job.dirtyKeys())
                   job.revert()
                 }
               }, 'Undo changes')
@@ -271,63 +220,110 @@ function JobModal({ attrs: { job } }) {
   }
 }
 
-function JobItemsTable() {
+/**
+ * 
+ * @attribute {Job} job
+ * 
+ */
+function JobItemsTable({ attrs: { job } }) {
+  
+  // let itemsCopy = job.get('items').map(i => i)
+
+  function removeItem(item) {
+    console.log('removing item', item);
+    job.remove('items', item)
+  }
+
+  function updateItem(origItem, updatedItem) {
+    const index = job.get('items').findIndex(i => i === origItem)
+    if (index === -1) {
+      throw new Error('Could not find item in items array')
+    }
+    let itemsCopy = job.get('items').map(i => ({ ...i }))
+    itemsCopy[index] = updatedItem
+    console.log(itemsCopy);
+    job.set('items', itemsCopy)
+  }
+
   return {
-    view({ attrs: { items, onRemove, onEdit } }) {
+
+    view() {
       return m('table.ui compact attached table', [
         m('thead', [
           m('tr', [
-            m('th'),
             m('th', 'Description'),
             m('th', 'Qty'),
             m('th'),
           ])
         ]),
-        m('tbody', items.map((item, index) => m(JobItemsTableRow, { item, index, onRemove, onEdit })))
+        m('tbody', job.get('items').map((item) => m(JobItemsTableRow, {
+          // key: item,
+          item,
+          onRemove: removeItem,
+          onEdit: updateItem,
+        })))
+      ])
+    }
+
+  }
+
+}
+
+function JobItemsTableRow({ attrs: { item } }) {
+  let isEditing = false
+  
+  return {
+    view({ attrs: { item, onRemove, onEdit } }) {
+      if (isEditing) {
+        return m(EditableRow, { item, onEdit, stopEditing: () => isEditing = false })
+      }
+      return m('tr', [
+        // m('td', index + 1),
+        m('td', item.description),
+        m('td', item.qty),
+        m('td.right aligned', [
+          m('.ui small icon button', {
+            onclick: () => isEditing = true
+          }, m('i.pencil icon')),
+          m('.ui small icon button', {
+            onclick: () => onRemove(item)
+          }, m('i.remove icon')),
+        ])
       ])
     }
   }
 }
 
-function JobItemsTableRow({ attrs: { item } }) {
-  let isEditing = false
-  let clone = { ...item }
+function EditableRow() {
+  let clone
   return {
-    view({ attrs: { item, index, onRemove, onEdit } }) {
-      if (isEditing) {
-        return m('tr', [
-          m('td', index + 1),
-          m('td', m('.ui small fluid input', [
-            m('input[type=text]', {
-              value: clone.description,
-              oninput: e => clone.description = e.target.value
-            })
-          ])),
-          m('td', m('.ui small fluid input', [
-            m('input[type=number]', {
-              value: clone.qty,
-              oninput: e => clone.qty = Number(e.target.value)
-            })
-          ])),
-          m('td', [
-            m('.ui small button', { 
-              onclick: () => {
-                onEdit(clone, index)
-                isEditing = false
-              }
-            }, 'Done')
-          ])
-        ])
-      }
+    oninit({ attrs }) {
+      const { item } = attrs
+      clone = { ...item }
+    },
+    view({ attrs }) {
+      const { item, onEdit, stopEditing } = attrs
       return m('tr', [
-        m('td', index + 1),
-        m('td', item.description),
-        m('td', item.qty),
-        m('td', [
-          m('.ui small icon button', { onclick: () => isEditing = true }, m('i.pencil icon')),
-          m('.ui small icon button', m('i.remove icon', {
-            onclick: () => onRemove(item)
-          })),
+        // m('td', index + 1),
+        m('td', m('.ui small fluid input', [
+          m('input[type=text]', {
+            value: clone.description,
+            oninput: e => clone.description = e.target.value
+          })
+        ])),
+        m('td', m('.ui small fluid input', [
+          m('input[type=number]', {
+            value: clone.qty,
+            oninput: e => clone.qty = Number(e.target.value)
+          })
+        ])),
+        m('td.right aligned', [
+          m('.ui small button', { 
+            onclick: () => {
+              onEdit(item, clone)
+              stopEditing()
+            }
+          }, 'Done')
         ])
       ])
     }
