@@ -7,7 +7,8 @@ export default Parse.Object.extend('Job', {
     this.setOrderDate(new Date()),
     this.set('dispatch', {
       description: 'Customer collect'
-    })
+    }),
+    this.set('items', [])
   },
 
   isReadyToSave() {
