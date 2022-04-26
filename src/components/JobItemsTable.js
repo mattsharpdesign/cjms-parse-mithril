@@ -1,4 +1,5 @@
 import m from 'mithril'
+import JobItemForm from './JobItemForm';
 
 /**
  * 
@@ -33,6 +34,10 @@ import m from 'mithril'
             m('tr', [
               m('th', 'Description'),
               m('th', 'Qty'),
+              m('th', 'Rate'),
+              m('th', 'Dimensions'),
+              m('th', 'Each'),
+              m('th', 'Total'),
               m('th'),
             ])
           ]),
@@ -58,11 +63,18 @@ function JobItemsTableRow({ attrs: { item } }) {
   return {
     view({ attrs: { item, onRemove, onEdit } }) {
       if (isEditing) {
-        return m(EditableRow, { item, onEdit, stopEditing: () => isEditing = false })
+        return m(CelledEditableTableRow, { item, onEdit, stopEditing: () => isEditing = false })
+        // return m('tr', [
+        //   m('td[colspan=6]', m(JobItemForm, { item, onEdit, stopEditing: () => isEditing = false }))
+        // ])
       }
       return m('tr', [
         m('td', item.description),
         m('td', item.qty),
+        m('td', chargeRateAsString(item)),
+        m('td', dimsAsString(item)),
+        m('td', chargeEachAsString(item)),
+        m('td', chargeTotalAsString(item)),
         m('td.right aligned', [
           m('.ui small icon button', {
             onclick: () => isEditing = true
@@ -76,7 +88,39 @@ function JobItemsTableRow({ attrs: { item } }) {
   }
 }
 
-function EditableRow() {
+function chargeEachAsString(item) {
+  return `$${item.chargeEach}`
+}
+
+function chargeTotalAsString(item) {
+  return `$${item.chargeTotal}`
+}
+
+function SpannedEditableTableRow() {
+  let clone
+  return {
+    oninit({ attrs: { item } }) {
+      clone = JSON.parse(JSON.stringify(item))
+    },
+    view({ attrs: { item, onEdit, stopEditing }}) {
+      return m('tr', [
+        m('td[colspan=5]', [
+          'form goes here...'
+        ]),
+        m('td.right aligned', [
+          m('.ui small button', { 
+            onclick: () => {
+              onEdit(item, clone)
+              stopEditing()
+            }
+          }, 'Done')
+        ])
+      ])
+    }
+  }
+}
+
+function CelledEditableTableRow() {
   let clone
   return {
     oninit({ attrs }) {
@@ -89,16 +133,22 @@ function EditableRow() {
         // m('td', index + 1),
         m('td', m('.ui small fluid input', [
           m('input[type=text]', {
+            // style: { minWidth: '170px' },
             value: clone.description,
             oninput: e => clone.description = e.target.value
-          })
+          }),
+          m('br'),
+          m('.selectable', 'Select repeat job'),
         ])),
-        m('td', m('.ui small fluid input', [
+        m('td', m('.ui small quantity input', [
           m('input[type=number]', {
             value: clone.qty,
             oninput: e => clone.qty = Number(e.target.value)
           })
         ])),
+        m('td', 'rate...............'),
+        m('td', m(DimensionsInputs, { item: clone })),
+        m('td', 'charge.............'),
         m('td.right aligned', [
           m('.ui small button', { 
             onclick: () => {
@@ -110,4 +160,44 @@ function EditableRow() {
       ])
     }
   }
+}
+
+const DimensionsInputs = {
+  view({ attrs: { item }}) {
+    return m('[', [
+      m('.ui tiny icon dimensions input', [
+        m('input[type=number][placeholder=X mm]', {
+          // style: { width: '110px' },
+          value: item.dimensions ? item.dimensions.hasOwnProperty('x')
+            ? item.dimensions.x : ''
+            : '',
+        }),
+        m('i.arrows alternate horizontal icon')
+      ]),
+      m('br'),
+      m('.ui icon dimensions input', [
+        m('input[type=number][placeholder=Y mm]', {
+          // style: { width: '110px' },
+          value: item.dimensions ? item.dimensions.hasOwnProperty('y')
+            ? item.dimensions.y : ''
+            : '',
+        }),
+        m('i.arrows alternate vertical icon'),
+      ])
+    ])
+  }
+}
+
+function chargeRateAsString(item) {
+  return `$${item.rate.charge} per ${item.rate.units}`
+}
+
+function dimsAsString(item) {
+  if (!item.dimensions || !item.dimensions.hasOwnProperty('x')) {
+    return ''
+  }
+  if (!item.dimensions.hasOwnProperty('y')) {
+    return `${item.dimensions.x} mm`
+  }
+  return `${item.dimensions.x} x ${item.dimensions.y} mm`
 }

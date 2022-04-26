@@ -49,6 +49,7 @@ Animations (mainly for modals)
 
 .selectable {
   cursor: pointer;
+  color: #4183c4;
 }
 
 .process-description {
@@ -64,4 +65,12 @@ span.process-heading {
 
 #job-form-delivery-address-input {
   margin-top: 14px;
+}
+
+.ui.quantity.input {
+  width: 7em !important;
+}
+
+.ui.dimensions.input { 
+  width: 8em !important;
 }
