@@ -3,13 +3,14 @@ import processesConfig from '../processes-config'
 import { forHtmlInput, fromHtmlInput } from '../date-functions'
 import Dimmer from './Modal'
 import CustomerSelector from './CustomerSelector'
+import JobItemsTable from './JobItemsTable'
 
 function JobModal({ attrs: { job } }) {
   console.log(job)
   
   let isCustomerSelectorOpen = false
-  let isItemFormOpen = false
-  let itemIndex
+  // let isItemFormOpen = false
+  // let itemIndex
 
   return {
 
@@ -145,7 +146,7 @@ function JobModal({ attrs: { job } }) {
 
               // Flags (urgent, qa)
               m('.fields', {
-                style: { paddingTop: '28px', paddingBottom: '42px' },
+                style: { paddingTop: '28px', paddingBottom: '28px' },
               }, [
                 m('.field', {
                   style: { marginRight: '42px' },
@@ -172,7 +173,6 @@ function JobModal({ attrs: { job } }) {
               ]),
 
               // Job items
-              m('h4.ui top attached segment', 'Job Items'),
               m(JobItemsTable, { job }),
 
               // Notes
@@ -219,194 +219,5 @@ function JobModal({ attrs: { job } }) {
     }
   }
 }
-
-/**
- * 
- * @attribute {Job} job
- * 
- */
-function JobItemsTable({ attrs: { job } }) {
-  
-  // let itemsCopy = job.get('items').map(i => i)
-
-  function removeItem(item) {
-    console.log('removing item', item);
-    job.remove('items', item)
-  }
-
-  function updateItem(origItem, updatedItem) {
-    const index = job.get('items').findIndex(i => i === origItem)
-    if (index === -1) {
-      throw new Error('Could not find item in items array')
-    }
-    let itemsCopy = job.get('items').map(i => ({ ...i }))
-    itemsCopy[index] = updatedItem
-    console.log(itemsCopy);
-    job.set('items', itemsCopy)
-  }
-
-  return {
-
-    view() {
-      return m('table.ui compact attached table', [
-        m('thead', [
-          m('tr', [
-            m('th', 'Description'),
-            m('th', 'Qty'),
-            m('th'),
-          ])
-        ]),
-        m('tbody', job.get('items').map((item) => m(JobItemsTableRow, {
-          // key: item,
-          item,
-          onRemove: removeItem,
-          onEdit: updateItem,
-        })))
-      ])
-    }
-
-  }
-
-}
-
-function JobItemsTableRow({ attrs: { item } }) {
-  let isEditing = false
-  
-  return {
-    view({ attrs: { item, onRemove, onEdit } }) {
-      if (isEditing) {
-        return m(EditableRow, { item, onEdit, stopEditing: () => isEditing = false })
-      }
-      return m('tr', [
-        // m('td', index + 1),
-        m('td', item.description),
-        m('td', item.qty),
-        m('td.right aligned', [
-          m('.ui small icon button', {
-            onclick: () => isEditing = true
-          }, m('i.pencil icon')),
-          m('.ui small icon button', {
-            onclick: () => onRemove(item)
-          }, m('i.remove icon')),
-        ])
-      ])
-    }
-  }
-}
-
-function EditableRow() {
-  let clone
-  return {
-    oninit({ attrs }) {
-      const { item } = attrs
-      clone = { ...item }
-    },
-    view({ attrs }) {
-      const { item, onEdit, stopEditing } = attrs
-      return m('tr', [
-        // m('td', index + 1),
-        m('td', m('.ui small fluid input', [
-          m('input[type=text]', {
-            value: clone.description,
-            oninput: e => clone.description = e.target.value
-          })
-        ])),
-        m('td', m('.ui small fluid input', [
-          m('input[type=number]', {
-            value: clone.qty,
-            oninput: e => clone.qty = Number(e.target.value)
-          })
-        ])),
-        m('td.right aligned', [
-          m('.ui small button', { 
-            onclick: () => {
-              onEdit(item, clone)
-              stopEditing()
-            }
-          }, 'Done')
-        ])
-      ])
-    }
-  }
-}
-
-/* 
-function JobItems() {
-
-  let isItemFormOpen = false
-  let selectedItem
-
-  return {
-    view({ attrs: { items, onRemove }}) {
-      
-      // function editItem(index) {
-      //   m.route.set(`${m.route.get()}?editItem=${index}`)
-      // }
-
-      return m('[', [
-
-        m('h4.ui top attached header', 'Items'),
-        m('.ui attached segment', {
-          class: !items.length > 0 ? 'secondary' : '',
-        }, [
-        
-          items.length > 0 && m('.ui divided items', [
-            items.map((item, index) => m(JobItemRow, { item, index, onRemove }))
-          ]),
-        
-          !items.length > 0 && 'No items have been added.',
-        ]),
-        
-        m('.ui bottom attached secondary segment', [
-          m('a[href]', 'Add an item'),
-        ]),
-      ])
-    }
-  }
-}
- */
-
-/* 
-function JobItemRow() {
-
-  return {
-
-    view({ attrs: { item, index, onRemove }}) {
-      function editItem() {
-        // item.description = 'test'
-        m.route.set(`${m.route.get()}?editItem=${index}`)
-      }
-      return m('[', [
-
-
-        m('.item', {
-          // key: index,
-        }, [
-          m('.content', [
-            m('.ui label', `${item.qty}x`),
-            ' ',
-            item.description,
-            m('.ui right floated icon button', {
-              onclick: () => {
-                onRemove(item)
-              }
-            }, [
-              m('i.remove icon')
-            ]),
-            m('.ui  right floated icon button', {
-              onclick: () => editItem()
-            // m(m.route.Link, {
-            //   class: 'ui right floated icon button',
-            //   href: `${m.route.get()}?editItem=${index}`
-            }, [
-              m('i.pencil icon')
-            ]),
-          ])
-        ])
-      ])
-    }
-  }
-}
-*/
 
 export default JobModal
